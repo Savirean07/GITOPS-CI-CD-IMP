@@ -1,0 +1,15 @@
+
+{
+  "name": "to-do-list-application",
+  "version": "1.0.0",
+  "description": "Simple static To-Do List web application",
+  "scripts": {
+    "build": "echo 'No build step needed for static site'",
+    "start": "live-server"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
