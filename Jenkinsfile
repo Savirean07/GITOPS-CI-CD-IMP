@@ -32,9 +32,8 @@ pipeline {
         stage('Code Quality (SonarQube)') {
             steps {
                 sh 'chmod +x run-sonarqube.sh'
-                // The withSonarQubeEnv wrapper will automatically use the 'sonarqube-token' credential if your
-                // SonarQube server is configured in Jenkins -> Manage Jenkins -> Configure System
-                withSonarQubeEnv('SonarQube') {
+                // Securely access the SonarQube token and pass it to the script
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
                     sh './run-sonarqube.sh'
                 }
             }
@@ -89,10 +88,12 @@ pipeline {
 
     post {
         always {
-            // Send an email notification when the pipeline finishes
-            mail to: 'jangidhimanshu47@gmail.com',
-                 subject: "Jenkins Job - ${currentBuild.fullDisplayName}",
-                 body: "Job finished with status: ${currentBuild.currentResult}"
+            // The 'mail' step is commented out. To use it, you must configure an SMTP server
+            // in Jenkins -> Manage Jenkins -> Configure System -> E-mail Notification.
+            // mail to: 'jangidhimanshu47@gmail.com',
+            //      subject: "Jenkins Job - ${currentBuild.fullDisplayName}",
+            //      body: "Job finished with status: ${currentBuild.currentResult}"
+            echo "Pipeline finished with status: ${currentBuild.currentResult}"
         }
     }
 }
