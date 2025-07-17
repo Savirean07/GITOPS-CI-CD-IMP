@@ -24,9 +24,17 @@ pipeline {
 
         stage('Security Scan (OWASP)') {
             steps {
-                withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                    sh 'chmod +x run-owasp.sh'
-                    sh './run-owasp.sh'
+                script {
+                    try {
+                        withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                            sh 'chmod +x run-owasp.sh'
+                            sh './run-owasp.sh'
+                        }
+                    } catch (err) {
+                        echo 'Could not find nvd-api-key credential, running OWASP scan without it.'
+                        sh 'chmod +x run-owasp.sh'
+                        sh './run-owasp.sh'
+                    }
                 }
             }
         }
