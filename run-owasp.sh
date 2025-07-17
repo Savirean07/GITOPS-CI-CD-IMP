@@ -4,7 +4,7 @@ set -e
 echo "Running OWASP Dependency Check..."
 
 # Run the scan
-dependency-check.sh \
+/opt/homebrew/bin/dependency-check.sh \
   --project "GITOPS-CI-CD-IMP" \
   --scan . \
   --format "ALL" \
