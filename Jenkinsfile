@@ -2,20 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // --- Credentials (to be configured in Jenkins) ---
-        // Note: You must create these credentials in your Jenkins instance.
-
-        // ID of a 'Secret text' credential for your SonarQube token
-        SONAR_TOKEN             = credentials('sonarqube-token')
-        // ID of a 'Username with password' credential for Docker Hub
-        DOCKERHUB_CREDENTIALS   = credentials('dockerhub-credentials')
-        // ID of a 'Secret text' credential for your Argo CD auth token
-        ARGOCD_AUTH_TOKEN       = credentials('argocd-token')
-
         // --- Configuration (customize as needed) ---
         SONAR_HOST_URL          = 'http://localhost:9000'
-        // Use the username from the Docker Hub credential for the image name
-        DOCKER_IMAGE            = "${DOCKERHUB_CREDENTIALS_USR}/gitops-app"
         ARGO_CD_SERVER          = 'http://your-argocd-server' // e.g., https://argocd.example.com
         ARGO_CD_APP_NAME        = 'gitops-app'
     }
@@ -44,7 +32,9 @@ pipeline {
         stage('Code Quality (SonarQube)') {
             steps {
                 sh 'chmod +x run-sonarqube.sh'
-                withSonarQubeEnv('SonarQube') { // Assumes SonarQube is configured in Jenkins global config
+                // The withSonarQubeEnv wrapper will automatically use the 'sonarqube-token' credential if your
+                // SonarQube server is configured in Jenkins -> Manage Jenkins -> Configure System
+                withSonarQubeEnv('SonarQube') {
                     sh './run-sonarqube.sh'
                 }
             }
@@ -52,21 +42,28 @@ pipeline {
 
         stage('Docker Build & Push') {
             steps {
-                sh """
-                # Build the Docker image with the latest commit hash as the tag
-                docker build -t ${DOCKER_IMAGE}:${env.GIT_COMMIT.take(7)} .
-                # Log in to Docker Hub using the username and password from Jenkins credentials
-                echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin
-                # Push the image to Docker Hub
-                docker push ${DOCKER_IMAGE}:${env.GIT_COMMIT.take(7)}
-                """
+                // Securely access the Docker Hub credentials only for this stage
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                    script {
+                        def DOCKER_IMAGE = "${DOCKERHUB_USER}/gitops-app"
+                        sh """
+                        docker build -t ${DOCKER_IMAGE}:${env.GIT_COMMIT.take(7)} .
+                        echo ${DOCKERHUB_PASS} | docker login -u ${DOCKERHUB_USER} --password-stdin
+                        docker push ${DOCKER_IMAGE}:${env.GIT_COMMIT.take(7)}
+                        """
+                    }
+                }
             }
         }
 
         stage('Trivy Scan (Image Vulnerabilities)') {
             steps {
-                // Scan the newly pushed Docker image for vulnerabilities
-                sh "trivy image ${DOCKER_IMAGE}:${env.GIT_COMMIT.take(7)}"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                    script {
+                        def DOCKER_IMAGE = "${DOCKERHUB_USER}/gitops-app"
+                        sh "trivy image ${DOCKER_IMAGE}:${env.GIT_COMMIT.take(7)}"
+                    }
+                }
             }
         }
 
@@ -79,11 +76,13 @@ pipeline {
 
         stage('Trigger Argo CD Sync') {
             steps {
-                sh """
-                # Trigger a sync in Argo CD to deploy the new version
-                curl -k -X POST ${ARGO_CD_SERVER}/api/v1/applications/${ARGO_CD_APP_NAME}/sync \
-                -H \"Authorization: Bearer ${ARGOCD_AUTH_TOKEN}\"
-                """
+                // Securely access the Argo CD token only for this stage
+                withCredentials([string(credentialsId: 'argocd-token', variable: 'ARGOCD_TOKEN')]) {
+                    sh """
+                    curl -k -X POST ${ARGO_CD_SERVER}/api/v1/applications/${ARGO_CD_APP_NAME}/sync \
+                    -H \"Authorization: Bearer ${ARGOCD_TOKEN}\"
+                    """
+                }
             }
         }
     }
