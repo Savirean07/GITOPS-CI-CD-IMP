@@ -4,6 +4,11 @@ set -e
 echo "Running OWASP Dependency Check..."
 
 # Run the scan
-dependency-check --project "MyApp" --scan . --format HTML --out ./owasp-report
+dependency-check.sh \
+  --project "GITOPS-CI-CD-IMP" \
+  --scan . \
+  --format "ALL" \
+  --out ./owasp-report \
+  --disableYarnAudit
 
 echo "OWASP Scan complete. Report saved to ./owasp-report"
