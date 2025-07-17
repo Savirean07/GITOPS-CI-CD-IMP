@@ -27,7 +27,6 @@ pipeline {
                     withEnv(["PATH+DC=dependency-check/bin"]) {
                         try {
                             withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                            echo '✅ Successfully loaded nvd-api-key credential. Starting scan...'
                                 sh 'chmod +x run-owasp.sh'
                                 sh './run-owasp.sh'
                             }
