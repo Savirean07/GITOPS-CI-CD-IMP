@@ -7,6 +7,10 @@ set -e # Exit immediately if a command exits with a non-zero status.
 
 echo "Running OWASP Dependency Check..."
 
+echo "Installing project dependencies..."
+npm install
+
+
 # --- Setup Dependency-Check --- 
 DC_VERSION="9.2.0" # You can update this version as needed
 DC_DIR="dependency-check"
