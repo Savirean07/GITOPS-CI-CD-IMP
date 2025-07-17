@@ -1,25 +1,29 @@
 #!/bin/bash
-set -e
+
+# This script runs the OWASP Dependency-Check tool.
+# It will download the tool automatically if not found.
+
+set -e # Exit immediately if a command exits with a non-zero status.
 
 echo "Running OWASP Dependency Check..."
 
-# --- Find the dependency-check executable ---
-# This makes the script more robust by checking common installation paths.
-if [ -x "/opt/homebrew/bin/dependency-check.sh" ]; then
-  # Path for Apple Silicon Macs
-  DC_EXECUTABLE="/opt/homebrew/bin/dependency-check.sh"
-elif [ -x "/usr/local/bin/dependency-check.sh" ]; then
-  # Path for Intel Macs
-  DC_EXECUTABLE="/usr/local/bin/dependency-check.sh"
+# --- Setup Dependency-Check --- 
+DC_VERSION="9.2.0" # You can update this version as needed
+DC_DIR="dependency-check"
+
+if [ ! -d "$DC_DIR" ]; then
+  echo "Dependency-Check not found. Downloading version ${DC_VERSION}..."
+  wget "https://github.com/jeremylong/DependencyCheck/releases/download/v${DC_VERSION}/dependency-check-${DC_VERSION}-release.zip"
+  unzip "dependency-check-${DC_VERSION}-release.zip"
+  rm "dependency-check-${DC_VERSION}-release.zip"
 else
-  echo "[ERROR] dependency-check.sh not found."
-  echo "Please ensure OWASP Dependency-Check is installed and accessible at /opt/homebrew/bin or /usr/local/bin."
-  exit 1
+  echo "Dependency-Check already installed."
 fi
 
-echo "Using Dependency-Check executable at: ${DC_EXECUTABLE}"
+DC_EXECUTABLE="${DC_DIR}/bin/dependency-check.sh"
 
 # --- Run the scan ---
+echo "Starting OWASP scan..."
 "${DC_EXECUTABLE}" \
   --project "GITOPS-CI-CD-IMP" \
   --scan . \
