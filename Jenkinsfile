@@ -29,13 +29,10 @@ pipeline {
             }
         }
 
-        stage('Code Quality (SonarQube)') {
+        stage('Lint Code (ESLint)') {
             steps {
-                sh 'chmod +x run-sonarqube.sh'
-                // Securely access the SonarQube token and pass it to the script
-                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-                    sh './run-sonarqube.sh'
-                }
+                // Run ESLint to check for code quality issues
+                sh 'npx eslint .'
             }
         }
 
