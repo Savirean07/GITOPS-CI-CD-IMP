@@ -22,7 +22,7 @@ fi
 
 DC_EXECUTABLE="${DC_DIR}/bin/dependency-check.sh"
 
-DC_ARGS="--project GITOPS-CI-CD-IMP --scan node_modules --format ALL --out ./owasp-report --disableYarnAudit --noupdate --enableExperimental"
+DC_ARGS="--project GITOPS-CI-CD-IMP --scan node_modules --format ALL --out ./owasp-report --disableYarnAudit --noupdate --enableExperimental --nodeAuditSkipDevDependencies"
 
 if [ -n "$NVD_API_KEY" ]; then
   DC_ARGS="$DC_ARGS --nvdApiKey $NVD_API_KEY"
