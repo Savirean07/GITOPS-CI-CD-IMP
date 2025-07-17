@@ -27,7 +27,7 @@ fi
 DC_EXECUTABLE="${DC_DIR}/bin/dependency-check.sh"
 
 # --- Run the scan ---
-DC_ARGS="--project GITOPS-CI-CD-IMP --scan . --format ALL --out ./owasp-report --disableYarnAudit --noupdate"
+DC_ARGS="--project GITOPS-CI-CD-IMP --scan package.json --scan package-lock.json --format ALL --out ./owasp-report --disableYarnAudit --noupdate"
 
 # Only add the NVD API key if the environment variable is set
 if [ -n "$NVD_API_KEY" ]; then
