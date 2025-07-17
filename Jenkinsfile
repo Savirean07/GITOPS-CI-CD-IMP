@@ -4,12 +4,22 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/Savirean07/GITOPS-CI-CD-IMP.git'
             }
         }
         stage('Build') {
             steps {
-                echo 'Build steps go here...'
+                sh './build.sh'
+            }
+        }
+        stage('Security Scan') {
+            steps {
+                sh './run-owasp.sh'
+            }
+        }
+        stage('Code Quality') {
+            steps {
+                sh './run-sonarqube.sh'
             }
         }
     }
