@@ -24,8 +24,10 @@ pipeline {
 
         stage('Security Scan (OWASP)') {
             steps {
-                sh 'chmod +x run-owasp.sh'
-                sh './run-owasp.sh'
+                withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                    sh 'chmod +x run-owasp.sh'
+                    sh './run-owasp.sh'
+                }
             }
         }
 

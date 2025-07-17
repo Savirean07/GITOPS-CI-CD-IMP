@@ -29,6 +29,7 @@ echo "Starting OWASP scan..."
   --scan . \
   --format "ALL" \
   --out ./owasp-report \
-  --disableYarnAudit
+  --disableYarnAudit \
+  --nvdApiKey "${NVD_API_KEY}"
 
 echo "OWASP Scan complete. Report saved to ./owasp-report"
