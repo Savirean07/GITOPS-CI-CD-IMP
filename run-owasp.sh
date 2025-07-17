@@ -23,7 +23,7 @@ fi
 DC_EXECUTABLE="${DC_DIR}/bin/dependency-check.sh"
 
 mkdir -p odc-data
-DC_ARGS="--project GITOPS-CI-CD-IMP --scan . --format ALL --out ./owasp-report --data ./odc-data --disableYarnAudit --noupdate --enableExperimental --disableArchive"
+DC_ARGS="--project GITOPS-CI-CD-IMP --scan . --format ALL --out ./owasp-report --data ./odc-data --disableYarnAudit --enableExperimental --disableArchive"
 
 if [ -n "$NVD_API_KEY" ]; then
   DC_ARGS="$DC_ARGS --nvdApiKey $NVD_API_KEY"
