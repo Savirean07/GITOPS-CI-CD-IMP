@@ -23,13 +23,16 @@ fi
 DC_EXECUTABLE="${DC_DIR}/bin/dependency-check.sh"
 
 # --- Run the scan ---
+DC_ARGS="--project GITOPS-CI-CD-IMP --scan . --format ALL --out ./owasp-report --disableYarnAudit"
+
+# Only add the NVD API key if the environment variable is set
+if [ -n "$NVD_API_KEY" ]; then
+  DC_ARGS="$DC_ARGS --nvdApiKey \"$NVD_API_KEY\""
+else
+  echo "NVD_API_KEY not set. Running scan without it. This may result in errors or long scan times."
+fi
+
 echo "Starting OWASP scan..."
-"${DC_EXECUTABLE}" \
-  --project "GITOPS-CI-CD-IMP" \
-  --scan . \
-  --format "ALL" \
-  --out ./owasp-report \
-  --disableYarnAudit \
-  --nvdApiKey "${NVD_API_KEY}"
+eval "\"${DC_EXECUTABLE}\" $DC_ARGS"
 
 echo "OWASP Scan complete. Report saved to ./owasp-report"
