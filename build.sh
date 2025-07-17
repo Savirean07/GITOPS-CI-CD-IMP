@@ -1,11 +1,9 @@
 #!/bin/bash
 set -e
 
-echo "Building application..."
-# Example: for a Python app
-# pip install -r requirements.txt
+echo "Building Node.js application..."
 
-# Example: for a Node app
-# npm install && npm run build
+# Install dependencies
+npm install
 
 echo "Build complete!"
