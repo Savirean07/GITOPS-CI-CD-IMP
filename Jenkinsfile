@@ -4,11 +4,13 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Savirean07/GITOPS-CI-CD-IMP.git'
+                git branch: 'main', url: 'https://github.com/Savirean07/GITOPS-CI-CD-IMP.git'
             }
         }
         stage('Build') {
             steps {
+                sh 'pwd'
+                sh 'ls -l'     // Optional debug
                 sh './build.sh'
             }
         }
