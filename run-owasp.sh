@@ -25,11 +25,7 @@ DC_EXECUTABLE="${DC_DIR}/bin/dependency-check.sh"
 mkdir -p odc-data
 DC_ARGS="--project GITOPS-CI-CD-IMP --scan . --format ALL --out ./owasp-report --data ./odc-data --disableYarnAudit --enableExperimental --disableArchive"
 
-if [ -n "$NVD_API_KEY" ]; then
-  DC_ARGS="$DC_ARGS --nvdApiKey $NVD_API_KEY"
-else
-  echo "⚠️ NVD_API_KEY not set. Running without it may cause errors or slow scans."
-fi
+echo "INFO: Attempting scan without an NVD API key. This is expected to fail due to NVD policy."
 
 echo "Starting OWASP scan..."
 bash "$DC_EXECUTABLE" $DC_ARGS

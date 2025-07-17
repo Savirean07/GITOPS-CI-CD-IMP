@@ -25,21 +25,9 @@ pipeline {
             steps {
                 script {
                     withEnv(["PATH+DC=dependency-check/bin"]) {
-                        // This block securely handles the NVD API key.
-                        // It requires a Jenkins credential with the ID 'nvd-api-key'.
-                        withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY', required: false)]) {
-                            // Check if the credential was actually found and loaded.
-                            if (NVD_API_KEY) {
-                                echo '✅ Found nvd-api-key credential. Running scan with API key...'
-                                // The script will now run with the NVD_API_KEY environment variable set.
-                                sh 'chmod +x run-owasp.sh'
-                                sh './run-owasp.sh'
-                            } else {
-                                // If the credential is not found, fail the build with a clear error message.
-                                // The OWASP scan cannot succeed without a valid API key.
-                                error('❌ FATAL: Jenkins credential with ID \'nvd-api-key\' not found. The OWASP scan requires a valid NVD API key to update its database. Please configure the credential in Jenkins and re-run the build.')
-                            }
-                        }
+                        echo 'INFO: Forcing OWASP scan to run without an NVD API key as requested.'
+                        sh 'chmod +x run-owasp.sh'
+                        sh './run-owasp.sh'
                     }
                 }
             }
