@@ -1,74 +1,42 @@
 pipeline {
-
     agent any
 
     environment {
-        IMAGE_NAME = 'your-dockerhub-username/my-app'  // change to your Docker Hub image name
-        SONARQUBE_SERVER = 'SonarQube'                 // Jenkins global tool config name
+        GIT_REPO = 'https://github.com/Savirean07/GITOPS-CI-CD-IMP.git'
+        MANIFEST_FILE = 'k8s/deployment.yaml'
+        NEW_IMAGE_TAG = 'latest'
+        ARGOCD_APP = 'my-app'  // Argo CD app name
     }
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout Manifest Repo') {
             steps {
-                git 'https://github.com/Savirean07/GITOPS-CI-CD-IMP'
+                git branch: 'main', url: "${GIT_REPO}"
             }
         }
 
-        stage('Dependency Check (OWASP)') {
+        stage('Update Manifest with New Image') {
             steps {
-                script {
-                    try {
-                        sh '''
-                            dependency-check \
-                            --project "MyApp" \
-                            --scan . \
-                            --format HTML \
-                            --out ./report \
-                            --disableAssembly
-                        '''
-                    } catch (err) {
-                        echo "Dependency check failed: ${err}"
-                        currentBuild.result = 'UNSTABLE'
-                    }
-                }
+                sh """
+                    sed -i 's|image: .*|image: your-dockerhub-username/my-app:${NEW_IMAGE_TAG}|' ${MANIFEST_FILE}
+                    git config user.name "jenkins"
+                    git config user.email "jenkins@example.com"
+                    git add ${MANIFEST_FILE}
+                    git commit -m "Update image tag to ${NEW_IMAGE_TAG} from Jenkins CD"
+                    git push origin main
+                """
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Trigger Argo CD Sync') {
             steps {
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh 'sonar-scanner'
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t $IMAGE_NAME:latest .'
-            }
-        }
-
-        stage('Trivy Vulnerability Scan') {
-            steps {
-                sh 'trivy image $IMAGE_NAME:latest || true'  // Don't fail build if scan finds vulnerabilities
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                withCredentials([string(credentialsId: 'argocd-auth-token', variable: 'ARGO_TOKEN')]) {
                     sh '''
-                        echo $PASS | docker login -u $USER --password-stdin
-                        docker push $IMAGE_NAME:latest
+                        curl -X POST https://argocd.example.com/api/v1/applications/${ARGOCD_APP}/sync \
+                            -H "Authorization: Bearer $ARGO_TOKEN"
                     '''
                 }
-            }
-        }
-
-        stage('Trigger CD Job') {
-            steps {
-                build job: 'CD-JOB'
             }
         }
     }
@@ -76,20 +44,14 @@ pipeline {
     post {
         success {
             mail to: 'jangidhimanshu47@gmail.com',
-                 subject: "✅ CI Pipeline Success",
-                 body: "Your CI pipeline completed successfully. Docker image pushed and CD triggered."
+                 subject: "✅ CD Pipeline Success",
+                 body: "Deployment manifest updated and Argo CD sync triggered successfully."
         }
 
         failure {
             mail to: 'jangidhimanshu47@gmail.com',
-                 subject: "❌ CI Pipeline Failed",
-                 body: "Your CI pipeline failed. Check Jenkins logs for more info."
-        }
-
-        unstable {
-            mail to: 'jangidhimanshu47@gmail.com',
-                 subject: "⚠️ CI Pipeline Unstable",
-                 body: "OWASP scan or other step failed, but pipeline continued. Please review the report."
+                 subject: "❌ CD Pipeline Failed",
+                 body: "CD pipeline failed. Check Jenkins logs for details."
         }
     }
 }
