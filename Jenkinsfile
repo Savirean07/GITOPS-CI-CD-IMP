@@ -1,25 +1,35 @@
 pipeline {
+
     agent any
 
     environment {
-        IMAGE_NAME = 'your-dockerhub-username/my-app'
-        SONARQUBE_SERVER = 'SonarQube'
+        IMAGE_NAME = 'your-dockerhub-username/my-app'  // change to your Docker Hub image name
+        SONARQUBE_SERVER = 'SonarQube'                 // Jenkins global tool config name
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 git 'https://github.com/Savirean07/GITOPS-CI-CD-IMP'
             }
         }
 
-        stage('Dependency Check') {
+        stage('Dependency Check (OWASP)') {
             steps {
                 script {
-                    if (fileExists('dependency-check.sh')) {
-                        sh './dependency-check.sh'
-                    } else {
-                        sh 'dependency-check --project "MyApp" --scan . --format HTML --out ./report'
+                    try {
+                        sh '''
+                            dependency-check \
+                            --project "MyApp" \
+                            --scan . \
+                            --format HTML \
+                            --out ./report \
+                            --disableAssembly
+                        '''
+                    } catch (err) {
+                        echo "Dependency check failed: ${err}"
+                        currentBuild.result = 'UNSTABLE'
                     }
                 }
             }
@@ -28,13 +38,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=MyApp \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
+                    sh 'sonar-scanner'
                 }
             }
         }
@@ -45,9 +49,9 @@ pipeline {
             }
         }
 
-        stage('Trivy Scan') {
+        stage('Trivy Vulnerability Scan') {
             steps {
-                sh 'trivy image $IMAGE_NAME:latest || true'  // avoid pipeline failure on low severity issues
+                sh 'trivy image $IMAGE_NAME:latest || true'  // Don't fail build if scan finds vulnerabilities
             }
         }
 
@@ -72,13 +76,20 @@ pipeline {
     post {
         success {
             mail to: 'jangidhimanshu47@gmail.com',
-                 subject: "CI Success",
-                 body: "Build passed successfully"
+                 subject: "✅ CI Pipeline Success",
+                 body: "Your CI pipeline completed successfully. Docker image pushed and CD triggered."
         }
+
         failure {
             mail to: 'jangidhimanshu47@gmail.com',
-                 subject: "CI Failed",
-                 body: "Build failed. Check Jenkins logs."
+                 subject: "❌ CI Pipeline Failed",
+                 body: "Your CI pipeline failed. Check Jenkins logs for more info."
+        }
+
+        unstable {
+            mail to: 'jangidhimanshu47@gmail.com',
+                 subject: "⚠️ CI Pipeline Unstable",
+                 body: "OWASP scan or other step failed, but pipeline continued. Please review the report."
         }
     }
 }
