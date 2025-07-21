@@ -1,13 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        GIT_REPO = 'https://github.com/Savirean07/GITOPS-CI-CD-IMP.git'
-        MANIFEST_FILE = 'k8s/deployment.yaml'
-        NEW_IMAGE_TAG = 'latest'
-        ARGOCD_APP = 'my-app'  // Argo CD app name
-    }
-
     stages {
 
         stage('Checkout Manifest Repo') {
