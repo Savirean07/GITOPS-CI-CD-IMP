@@ -56,7 +56,7 @@ Feel free to contribute to this project by creating a pull request. We welcome a
 - If you find any bugs then please report them by creating an issue. 
 - If you can make a website look good by modifying then go ahead and describe it in issue and create pull request. 
 - If you can add more functionality, then create an issue and contribute by making pull request.
-
+- You can add it to your DEVOPS project using the code .
 
 
 
