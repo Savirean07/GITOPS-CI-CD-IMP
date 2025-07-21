@@ -2,9 +2,13 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE = 'sonarqube-server'  // Must match the name in Jenkins global config
+        SONARQUBE = 'sonarqube-server'            // Must match Jenkins → Global Tool Config
         DOCKERHUB_USER = 'himanshujangid'
         IMAGE_NAME = 'todo-app'
+    }
+
+    tools {
+        maven 'Maven 3.8.6'                        // Adjust based on your Jenkins Maven config
     }
 
     stages {
@@ -16,7 +20,10 @@ pipeline {
 
         stage('OWASP Dependency Check') {
             steps {
-                sh './dependency-check.sh --project "To-Do-App" --scan . --format HTML'
+                sh '''
+                    mkdir -p owasp-reports
+                    ./dependency-check.sh --project "To-Do-App" --scan . --format HTML --out owasp-reports
+                '''
             }
         }
 
@@ -36,7 +43,10 @@ pipeline {
 
         stage('Trivy Scan') {
             steps {
-                sh 'trivy image $DOCKERHUB_USER/$IMAGE_NAME:latest'
+                sh '''
+                    mkdir -p trivy-reports
+                    trivy image --exit-code 0 --severity HIGH,CRITICAL --format table $DOCKERHUB_USER/$IMAGE_NAME:latest > trivy-reports/scan.txt
+                '''
             }
         }
 
@@ -54,10 +64,11 @@ pipeline {
 
     post {
         success {
-            build job: 'To-Do-CD'  // Trigger CD pipeline (if set up)
+            echo '✅ Build succeeded! Triggering CD job...'
+            build job: 'To-Do-CD'  // Optional: Trigger your CD pipeline
         }
         failure {
-            echo 'Build failed. Please check the logs.'
+            echo '❌ Build failed. Check logs for details.'
         }
     }
 }
