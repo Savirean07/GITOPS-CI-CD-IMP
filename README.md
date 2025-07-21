@@ -68,5 +68,6 @@ Feel free to contribute to this project by creating a pull request. We welcome a
 Thanks a lot for spending your time. <br>
 Keep rocking 🍻 <br>
 Also Give it a Star 🌟, If you loved contributing to the project.
+And Comment down your views and experinces with this web app.
 
 ## [MIT Licensed](https://github.com/Kritika30032002/To-Do-List-Application/blob/main/LICENSE)
