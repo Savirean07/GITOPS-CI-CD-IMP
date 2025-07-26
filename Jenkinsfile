@@ -11,5 +11,11 @@ pipeline {
                 )
             }
         }
+        stage('Maven Compile') {
+            steps {
+                echo 'Maven Compile started'
+                sh 'mvn compile'
+            }
+        }
     }
 }
