@@ -4,7 +4,7 @@ pipeline{
         stage('Git Checkout')(
             steps 
             {
-                git branch: 'main',credentialsId: 'git-cred', url: 'https://github.com/Savirean07/To-Do-App-CI-CD.git
+                git branch: 'main',credentialsId: 'git-cred', url: 'https://github.com/Savirean07/To-Do-App-CI-CD.git'
             }
         )
     }
