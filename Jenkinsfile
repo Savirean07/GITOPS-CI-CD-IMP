@@ -18,5 +18,11 @@ pipeline {
                 sh 'export MAVEN_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED" && mvn compile'
             }
         }
+        stage('Maven Test') {
+            steps {
+                echo 'Maven Test started'
+                sh 'mvn test'
+            }
+        }
     }
 }
