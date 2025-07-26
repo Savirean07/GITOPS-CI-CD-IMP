@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 🔧 Basic project coordinates -->
+    <groupId>com.qubitware</groupId>        <!-- TODO: Change this to your company or GitHub org -->
+    <artifactId>To-Do-App</artifactId>        <!-- TODO: Match this to your repository/project name -->
+    <version>1.0.0</version>
+    <packaging>jar</packaging>              <!-- Use "war" if you're deploying to a servlet container -->
+
+    <!-- 📘 Project Info -->
+    <name>To-Do App</name>
+    <description>A sample to-do app for CI/CD pipeline demo</description>
+
+    <!-- 💡 Set Java version -->
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>   <!-- Change to your Java version -->
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
+    <!-- 📦 Dependencies -->
+    <dependencies>
+        <!-- Example: JUnit for testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Add your app-specific dependencies here -->
+        <!-- Example: Spring Boot -->
+        <!--
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        -->
+    </dependencies>
+
+    <!-- 🔌 Plugins -->
+    <build>
+        <plugins>
+            <!-- Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Optional: Shade plugin to create fat JAR -->
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+        </plugins>
+    </build>
+
+</project>
