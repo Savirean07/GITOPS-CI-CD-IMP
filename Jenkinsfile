@@ -30,19 +30,18 @@ pipeline {
                 sh 'trivy fs --format table --output trivy--filescanproject-output.txt .'
             }
         }
-        stage('Sonar Analysis')
-        {
+        stage('Sonar Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
+                    def scannerHome = tool 'SonarScanner'  // <-- must match name in Jenkins tool config
                     echo 'Sonar Analysis started'
-                    sh '''
-                       sonar-scanner \
-                       -Dsonar.projectKey=To-Do-App-CI-CD \
-                       -Dsonar.projectName=To-DO-App-CI-CD \
-                       -Dsonar.java.binaries=. \
-                       -Dsonar.exclusions=**/trivy--filescanproject-output.txt
-                       '''
-
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=To-Do-App-CI-CD \
+                        -Dsonar.projectName=To-DO-App-CI-CD \
+                        -Dsonar.java.binaries=. \
+                        -Dsonar.exclusions=**/trivy--filescanproject-output.txt
+                    """
                 }
             }
         }
