@@ -30,5 +30,16 @@ pipeline {
                 sh 'trivy fs --format table --output trivy--filescanproject-output.txt .'
             }
         }
+        stage('Sonar Analysis')
+        {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    echo 'Sonar Analysis started'
+                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=To-DO-App-CI-CD -Dsonar.projectKey=To-Do-App-CI-CD \
+                                                          -Dsonar.java.binaries=. -Dsonar.exclusions=**/trivy--filescanproject-output.txt '''
+
+                }
+            }
+        }
     }
 }
