@@ -61,6 +61,28 @@ pipeline {
                 sh 'export MAVEN_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED" && mvn package'
             }
         }
+        stage('Jar Publish') {
+            steps {
+                echo '<--------------Jar Publish started-------------->'
+                def server = Artifactory.newserver url:registry+'/artifactory' , credentialsId:"jfrogaccess"
+                def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
+                def uploadSpec = """{
+                    "files": [
+                        {
+                            "pattern": "target/database_service_project.jar",
+                            "target": "to-do-app-libs-release",
+                            "flat": "false",
+                            "props" : "${properties}",
+                            "exclusions":  ["*.sha1", "*.md5"]
+                        }
+                    ]
+                }"""
+                def buildInfo = server.upload(uploadSpec)
+                buildInfo.env.collect()
+                server.publishBuildInfo(buildInfo)
+                echo '<--------------Jar Publish completed-------------->' 
+            }
+        }
 
     }
 }
