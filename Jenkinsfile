@@ -31,22 +31,23 @@ pipeline {
             }
         }
         stage('Sonar Analysis') {
-            tools {
-                sonarScanner 'SonarScanner'  // This must match the name configured in Jenkins > Global Tool Configuration
-            }
             steps {
                 withSonarQubeEnv('sonar') {
-                    echo 'Sonar Analysis started'
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=To-Do-App-CI-CD \
-                        -Dsonar.projectName=To-DO-App-CI-CD \
-                        -Dsonar.java.binaries=. \
-                        -Dsonar.exclusions=**/trivy--filescanproject-output.txt
-                    '''
+                    script {
+                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        echo 'Sonar Analysis started'
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=To-Do-App-CI-CD \
+                            -Dsonar.projectName=To-DO-App-CI-CD \
+                            -Dsonar.java.binaries=. \
+                            -Dsonar.exclusions=**/trivy--filescanproject-output.txt
+                        """
+                    }
                 }
             }
         }
+
 
     }
 }
