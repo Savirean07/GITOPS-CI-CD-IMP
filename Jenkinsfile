@@ -66,6 +66,7 @@ pipeline {
                 script{
                        echo '<--------------Jar Publish started-------------->'
                        def server = Artifactory.server('jfrog-artifactory')
+                       def commitId = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                        def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
                        def uploadSpec = """{
                             "files": [
