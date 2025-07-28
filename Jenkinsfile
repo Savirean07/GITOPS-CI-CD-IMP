@@ -24,5 +24,11 @@ pipeline {
                 sh 'export MAVEN_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED" && mvn test'
             }
         }
+        stage('trivy Scan') {
+            steps {
+                echo 'Trivy Scan started'
+                sh 'trivy fs --format table --output trivy--filescanproject-output.txt .'
+            }
+        }
     }
 }
