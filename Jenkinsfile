@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven'           // Optional: if you’ve set up Maven in Jenkins Tools
+        jdk 'JDK-17'            // Optional: define JDK if needed
+    }
+
+    environment {
+        MAVEN_OPTS = "--add-opens java.base/java.lang=ALL-UNNAMED"
+    }
+
     stages {
         stage('Git Checkout') {
             steps {
@@ -15,25 +24,28 @@ pipeline {
         stage('Maven Compile') {
             steps {
                 echo 'Maven Compile started'
-                sh 'export MAVEN_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED" && mvn compile'
+                sh 'mvn compile'
             }
         }
+
         stage('Maven Test') {
             steps {
                 echo 'Maven Test started'
-                sh 'export MAVEN_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED" && mvn test'
+                sh 'mvn test'
             }
         }
-        stage('trivy Scan') {
+
+        stage('Trivy Scan') {
             steps {
                 echo 'Trivy Scan started'
                 sh 'trivy fs --format table --output trivy--filescanproject-output.txt .'
             }
         }
+
         stage('Sonar Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
-                    def scannerHome = tool 'SonarScanner'  // <-- must match name in Jenkins tool config
+                    def scannerHome = tool 'SonarScanner'  // Must match your Jenkins tool name
                     echo 'Sonar Analysis started'
                     sh """
                         ${scannerHome}/bin/sonar-scanner \
@@ -45,5 +57,7 @@ pipeline {
                 }
             }
         }
+
+
     }
 }
