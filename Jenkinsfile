@@ -64,7 +64,7 @@ pipeline {
         stage('Jar Publish') {
             steps {
                 script{
-                       echo '<--------------Jar Publish started-------------->'
+                       echo '<--------------Jar Publish has started-------------->'
                        def server = Artifactory.server('jfrog-artifactory')
                        def commitId = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                        def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
@@ -80,7 +80,7 @@ pipeline {
                     }"""
                     def buildInfo = server.upload(uploadSpec)
                     server.publishBuildInfo(buildInfo)
-                    echo '<--------------Jar Publish completed-------------->' 
+                    echo '<--------------Jar Publish has completed-------------->' 
                 }
             }
         }
