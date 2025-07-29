@@ -87,7 +87,7 @@ pipeline {
         
         stage('Docker Build and Tag') {
             steps {
-                script {
+                script{
                     echo "Building Docker image ${IMAGE_NAME}:${IMAGE_TAG}"
                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
@@ -95,7 +95,7 @@ pipeline {
         }
 
         stage('Trivy Docker Image Scan') {
-            steps {
+            steps{
                 echo 'Trivy Docker image scan started'
                 sh "trivy image --format table --output trivy-image-scan.txt ${IMAGE_NAME}:${IMAGE_TAG}"
             }
@@ -111,5 +111,6 @@ pipeline {
                     }
                 }
             }
+        }
     }
 }
