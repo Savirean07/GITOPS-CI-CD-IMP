@@ -1,6 +1,9 @@
 pipeline {
     agent any
-
+    environment {
+        IMAGE_NAME = 'savirean07/to-do-app'
+        IMAGE_TAG = "latest"
+    }
     stages {
         stage('Git Checkout') {
             steps {
