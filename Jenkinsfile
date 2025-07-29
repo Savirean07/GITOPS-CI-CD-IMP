@@ -111,7 +111,6 @@ pipeline {
             steps {
                 script{
                         echo 'Docker Push to Docker Hub started'
-                        sh 'docker image tag to-do-app:latest himanshujangid/to-do-app:latest'
                         sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                         sh 'docker logout'
                     }
