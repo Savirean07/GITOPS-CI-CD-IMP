@@ -84,6 +84,15 @@ pipeline {
                 }
             }
         }
+        stage('Docker Build Image & Tag') {
+            steps {
+                script {
+                    echo '<--------------Docker Build started-------------->'
+                    sh 'docker build -t savirean07/to-do-app:latest .'
+                    echo '<--------------Docker Build completed-------------->'
+                }
+            }
+        }
         
 
     }
