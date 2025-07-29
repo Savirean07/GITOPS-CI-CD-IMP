@@ -108,8 +108,8 @@ pipeline {
         stage('Docker Push to Docker Hub') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                    echo 'Docker Push started'{
+                        sh 'docker image tag to-do-app:latest savirean07/to-do-app:latest'
                         sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                         sh 'docker logout'
                     }
