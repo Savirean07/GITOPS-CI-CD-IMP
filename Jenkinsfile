@@ -8,6 +8,7 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 git(
+                    echo 'Git Checkout started',
                     branch: 'main',
                     credentialsId: 'git-cred',
                     url: 'https://github.com/Savirean07/To-Do-App-CI-CD.git'
