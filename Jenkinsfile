@@ -92,6 +92,7 @@ pipeline {
         stage('Docker Build and Tag') {
             steps {
                 script{
+                    echo 'Docker Build and Tag started'
                     echo "Building Docker image ${IMAGE_NAME}:${IMAGE_TAG}"
                     sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
