@@ -59,6 +59,7 @@ pipeline {
             steps {
                 echo 'Maven Package started'
                 sh 'export MAVEN_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED" && mvn package'
+                sh 'ls -lh target/'
             }
         }
         stage('Jar Publish') {
