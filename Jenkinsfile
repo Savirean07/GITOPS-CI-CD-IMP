@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        IMAGE_NAME = 'savirean07/to-do-app'
+        IMAGE_NAME = 'himanshujangid/to-do-app'
         IMAGE_TAG = "latest"
     }
     stages {
@@ -110,7 +110,7 @@ pipeline {
             steps {
                 script {
                     echo 'Docker Push started'{
-                        sh 'docker image tag to-do-app:latest savirean07/to-do-app:latest'
+                        sh 'docker image tag to-do-app:latest himanshujangid/to-do-app:latest'
                         sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                         sh 'docker logout'
                     }
