@@ -122,5 +122,27 @@ pipeline {
                 }
             }
         }
+        stage('Image Push to Azure Container Registry') {
+            steps {
+                script {
+                       echo 'Docker Push to Azure Container Registry started'
+
+                       def acrRegistry = 'todo1-fravf4hkffbshdbc.azurecr.io'
+                       def acrImage = "${acrRegistry}/to-do-app:${IMAGE_TAG}"
+
+                       // Retag image for ACR
+                       sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${acrImage}"
+
+                      // Login and push to ACR
+                      withCredentials([usernamePassword(credentialsId: 'acr-cred', usernameVariable: 'ACR_USERNAME', passwordVariable: 'ACR_PASSWORD')]) {
+                      sh """
+                        echo "$ACR_PASSWORD" | docker login ${acrRegistry} -u "$ACR_USERNAME" --password-stdin
+                        docker push ${acrImage}
+                        docker logout ${acrRegistry}
+                      """
+                    }
+                }
+            }
+        }
     }
 }
