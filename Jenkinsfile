@@ -84,16 +84,32 @@ pipeline {
                 }
             }
         }
-        stage('Docker Build Image & Tag') {
+        
+        stage('Docker Build and Tag') {
             steps {
                 script {
-                    echo '<--------------Docker Build started-------------->'
-                    sh 'docker build -t savirean07/to-do-app:latest .'
-                    echo '<--------------Docker Build completed-------------->'
+                    echo "Building Docker image ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
             }
         }
-        
 
+        stage('Trivy Docker Image Scan') {
+            steps {
+                echo 'Trivy Docker image scan started'
+                sh "trivy image --format table --output trivy-image-scan.txt ${IMAGE_NAME}:${IMAGE_TAG}"
+            }
+        }
+
+        stage('Docker Push to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                        sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                        sh 'docker logout'
+                    }
+                }
+            }
     }
 }
