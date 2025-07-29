@@ -144,5 +144,20 @@ pipeline {
                 }
             }
         }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    echo 'Deploying to Kubernetes cluster'
+                    
+                    withCredentials([file(credentialsId: 'K8-cred', variable: 'KUBECONFIG_FILE')]) {
+                        sh '''
+                            export KUBECONFIG=$KUBECONFIG_FILE
+                            kubectl apply -f deployment-service.yml
+                            kubectl rollout status deployment/to-do-app
+                        '''
+                    }
+                }
+            }
+        }
     }
 }

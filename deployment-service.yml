@@ -1,0 +1,35 @@
+# deployment-service.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: to-do-app
+  labels:
+    app: to-do-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: to-do-app
+  template:
+    metadata:
+      labels:
+        app: to-do-app
+    spec:
+      containers:
+        - name: to-do-app
+          image: todo1-fravf4hkffbshdbc.azurecr.io/to-do-app:latest
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: to-do-app-service
+spec:
+  selector:
+    app: to-do-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
