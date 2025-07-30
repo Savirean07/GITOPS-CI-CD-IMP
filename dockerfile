@@ -1,14 +1,18 @@
-# Use OpenJDK base image
-FROM openjdk:17-jdk-slim
+# Use Node.js base image
+FROM node:18
 
 # Create app directory
 WORKDIR /app
 
-# Copy the built jar file into the image
-COPY target/*.jar app.jar
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
 
-# Expose application port (customize as needed, e.g., 8080)
-EXPOSE 8080
+# Copy the rest of the application
+COPY . .
 
-# Run the JAR
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Expose the app port (adjust if different)
+EXPOSE 3000
+
+# Start the app (adjust if needed)
+CMD ["node", "index.js"]
