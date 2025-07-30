@@ -1,18 +1,13 @@
-# Use Node.js base image
-FROM node:18
+# Use Nginx to serve static files
+FROM nginx:alpine
 
-# Create app directory
-WORKDIR /app
+# Remove default nginx website
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copy package.json and install dependencies
-COPY package*.json ./
-RUN npm install
+# Copy your frontend build files to Nginx's web root
+COPY . /usr/share/nginx/html
 
-# Copy the rest of the application
-COPY . .
+# Expose port 80 for HTTP
+EXPOSE 80
 
-# Expose the app port (adjust if different)
-EXPOSE 3000
-
-# Start the app (adjust if needed)
-CMD ["node", "index.js"]
+# Start Nginx (default CMD is fine)
